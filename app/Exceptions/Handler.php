@@ -52,21 +52,8 @@ class Handler extends ExceptionHandler
     {
         $rendered = parent::render($request, $exception);
         $code = $rendered->getStatusCode();
-        $message = $code == 404 || $code == 405 ? 'Endpoint tidak ditemukan' : $exception->getMessage();
-        try {
-            JWTAuth::parseToken()->authenticate();
-        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $th) {
-            return $this->sendResponse('Token Expired', 401);
-        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $th) {
-            return $this->sendResponse('Token Invalid', 401);
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $th) {
-            return $this->sendResponse('Token not provided', 401);
-        }
-        return $this->sendResponse($message, $code);
-    }
-    public function sendResponse($message = null, $code)
-    {
         $status = $code == 200 ? true : false;
+        $message = $code == 404 || $code == 405 ? 'Endpoint tidak ditemukan' : $exception->getMessage();
         return response()->json([
             'status' => $status,
             'message' => $message

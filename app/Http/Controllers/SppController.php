@@ -19,11 +19,14 @@ class SppController extends Controller
     }
     public function store($siswa_id, Request $request)
     {
+        $siswa = Siswa::findOrFail($siswa_id);
+        if (count(Siswa::with('spp')->findOrFail($siswa_id)->spp->toArray()) === 3)
+            return $this->sendResponse('Error, satu siswa hanya boleh memiliki max 3 buah buku spp', null, 422);
         DB::beginTransaction();
         try {
-            $siswa = Siswa::findOrFail($siswa_id);
+            $siswa->findOrFail($siswa_id);
             $siswa->spp()->create([
-                'tahun' => $request->tahun,
+                'tahun_ajaran' => $request->tahun_ajaran,
                 'nominal' => $request->nominal,
             ]);
             DB::commit();

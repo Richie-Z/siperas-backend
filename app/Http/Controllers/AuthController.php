@@ -37,8 +37,9 @@ class AuthController extends Controller
         ]);
         if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
         $siswa = Siswa::where('nisn', $request->nisn)->first();
-        if (!$siswaToken = auth('siswa')->login($siswa))
+        if (empty($siswa))
             return $this->sendResponse('Gagal,NISN Salah/Belum Terdaftar', null, 401);
+        $siswaToken = auth('siswa')->login($siswa);
         return  $this->sendToken($siswaToken, 'siswa');
     }
     public function logout()

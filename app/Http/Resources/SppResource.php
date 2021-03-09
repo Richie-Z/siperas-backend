@@ -10,7 +10,7 @@ class SppResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'tahun' => $this->tahun,
+            'tahun_ajaran' => $this->tahun_ajaran,
             'history_pembayaran' => json_decode($this->history_pembayaran),
             'nominal' => $this->nominal,
         ];

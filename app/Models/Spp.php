@@ -9,7 +9,7 @@ class Spp extends Model
 {
     use HasFactory;
     protected $table = 'spp';
-    protected $fillable = ['nominal', 'tahun', 'siswa_id', 'history_pembayaran'];
+    protected $fillable = ['nominal', 'tahun_ajaran', 'siswa_id', 'history_pembayaran'];
     public function siswa()
     {
         return $this->belongsTo('App\Models\Siswa');

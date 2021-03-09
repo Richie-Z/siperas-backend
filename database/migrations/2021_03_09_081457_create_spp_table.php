@@ -16,7 +16,7 @@ class CreateSppTable extends Migration
     {
         Schema::create('spp', function (Blueprint $table) {
             $table->id();
-            $table->integer('tahun')->default(Carbon::now()->format('Y'));
+            $table->string('tahun_ajaran')->default(Carbon::now()->format('Y'));
             $table->text('history_pembayaran')->nullable();
             $table->integer('nominal')->default(200000);
             $table->unsignedBigInteger('siswa_id');

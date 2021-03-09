@@ -46,8 +46,10 @@ class KelasController extends Controller
     }
     public function show($id)
     {
-        $kelas = Kelas::with('siswa')->findOrFail($id);
-        return $this->sendResponse(null, new KelasResource($kelas), 200);
+        $kelas = Kelas::findOrFail($id);
+        return $this->sendResponse(null, new KelasResource($kelas->load(['siswa' => function ($query) {
+            $query->orderBy('nama', 'ASC');
+        }])), 200);
     }
     public function update($id, Request $request)
     {

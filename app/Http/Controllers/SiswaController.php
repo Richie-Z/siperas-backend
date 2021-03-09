@@ -19,6 +19,7 @@ class SiswaController extends Controller
     public function __construct()
     {
         $this->middleware('level:admin', ['only' => 'store', 'update', 'destory']);
+        $this->year = Carbon::now()->format('Y');
     }
     public function index()
     {
@@ -50,7 +51,7 @@ class SiswaController extends Controller
             $siswa->kelas_id = $request->kelas_id;
             $siswa->save();
             $siswa->spp()->create([
-                'tahun' => Carbon::now()->format('Y')
+                'tahun_ajaran' => $this->year - 1 . '/' . $this->year
             ]);
             DB::commit();
             return $this->sendResponse('Sukses menambah siswa', null, 200);
@@ -61,8 +62,10 @@ class SiswaController extends Controller
     }
     public function show($id)
     {
-        $siswa = Siswa::with('spp')->findOrFail($id);
-        return $this->sendResponse(null, new SiswaResource($siswa), 200);
+        $siswa = Siswa::findOrFail($id);
+        return $this->sendResponse(null, new SiswaResource($siswa->load(['spp' => function ($query) {
+            $query->orderBy('tahun_ajaran', 'ASC');
+        }])), 200);
     }
     public function update($id, Request $request)
     {

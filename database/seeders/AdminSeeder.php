@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Petugas;
 use Illuminate\Database\Seeder;
+use App\Models\Petugas;
 
-class DatabaseSeeder extends Seeder
+class AdminSeeder extends Seeder
 {
     /**
      * Run the database seeds.
