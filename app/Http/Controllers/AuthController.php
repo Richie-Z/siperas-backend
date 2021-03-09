@@ -58,10 +58,33 @@ class AuthController extends Controller
             foreach ($this->guardArray as $g) {
                 if (auth($g)->check()) $user = auth($g)->user();
             }
-
             return $this->sendResponse(null, $user, 200);
         } catch (\Exception $ex) {
             return $this->sendResponse(null, $ex, 500);
+        }
+    }
+    public function updateSiswa(Request $request)
+    {
+        if (!auth('siswa')->check())
+            return $this->sendResponse('Endpoint khusus untuk siswa', null, 401);
+        try {
+            $user = auth('siswa')->user();
+            $user->update($request->all());
+            return $this->sendResponse('Update profile berhasil', null, 200);
+        } catch (\Throwable $th) {
+            return $this->sendResponse('Update profile gagal', $th, 200);
+        }
+    }
+    public function update(Request $request)
+    {
+        if (!auth('petugas')->check())
+            return $this->sendResponse('Endpoint khusus untuk administrator', null, 401);
+        try {
+            $user = auth('petugas')->user();
+            $user->update($request->all());
+            return $this->sendResponse('Update profile berhasil', null, 200);
+        } catch (\Throwable $th) {
+            return $this->sendResponse('Update profile gagal', $th, 200);
         }
     }
 }

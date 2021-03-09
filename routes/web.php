@@ -14,34 +14,43 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+$router->get('/', function () {
+    return response()->json(['status' => true, 'message' => 'Selamat datang di Siperas Endpoint'], 200);
 });
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'auth'], function () use ($router) {
         $router->post('login', 'AuthController@login');
         $router->post('siswa/login', 'AuthController@loginSiswa');
         $router->group(['middleware' => 'auth'], function () use ($router) {
+            $router->put('update', 'AuthController@update');
             $router->get('profile', 'AuthController@profile');
             $router->delete('logout', 'AuthController@logout');
+            $router->put('siswa/update', 'AuthController@updateSiswa');
         });
     });
     $router->group(['middleware' => ['auth', 'level:admin'], 'prefix' => 'petugas'], function () use ($router) {
         $router->post('', 'PetugasController@store');
         $router->get('', 'PetugasController@index');
         $router->get('/{id:[0-9]+}', 'PetugasController@show');
-        $router->post('/{id:[0-9]+}', 'PetugasController@update');
+        $router->put('/{id:[0-9]+}', 'PetugasController@update');
         $router->delete('/{id:[0-9]+}', 'PetugasController@destroy');
     });
     $router->group(['prefix' => 'kelas', 'middleware' => 'auth'], function () use ($router) {
         $router->post('', 'KelasController@store');
         $router->get('', 'KelasController@index');
         $router->get('/{id:[0-9]+}', 'KelasController@show');
-        $router->post('/{id:[0-9]+}', 'KelasController@update');
+        $router->put('/{id:[0-9]+}', 'KelasController@update');
         $router->delete('/{id:[0-9]+}', 'KelasController@destroy');
     });
     $router->group(['prefix' => 'siswa', 'middleware' => 'auth'], function () use ($router) {
         $router->post('', 'SiswaController@store');
+        $router->post('/{siswa_id:[0-9]+}/spp/', 'SppController@store');
         $router->get('', 'SiswaController@index');
+        $router->get('/{id:[0-9]+}', 'SiswaController@show');
+        $router->get('/{siswa_id:[0-9]+}/spp/{id:[0-9]+}', 'SppController@show');
+        $router->put('/{id:[0-9]+}', 'SiswaController@update');
+        $router->put('/{siswa_id:[0-9]+}/spp/{id:[0-9]+}', 'SppController@update');
+        $router->delete('/{id:[0-9]+}', 'SiswaController@destroy');
+        $router->delete('/{siswa_id:[0-9]+}/spp/{id:[0-9]+}', 'SppController@destroy');
     });
 });

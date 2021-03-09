@@ -6,6 +6,8 @@ use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\SiswaResource;
+use Carbon\Carbon;
 
 class SiswaController extends Controller
 {
@@ -16,13 +18,14 @@ class SiswaController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('level:admin', ['only' => 'store']);
+        $this->middleware('level:admin', ['only' => 'store', 'update', 'destory']);
     }
     public function index()
     {
         try {
+            return $this->sendResponse(null, SiswaResource::collection(Siswa::all()), 200);
         } catch (\Throwable $th) {
-            //throw $th;
+            return $this->sendResponse('Gagal', $th, 500);
         }
     }
     public function store(Request $request)
@@ -47,7 +50,7 @@ class SiswaController extends Controller
             $siswa->kelas_id = $request->kelas_id;
             $siswa->save();
             $siswa->spp()->create([
-                'nominal' => 200000
+                'tahun' => Carbon::now()->format('Y')
             ]);
             DB::commit();
             return $this->sendResponse('Sukses menambah siswa', null, 200);
@@ -55,5 +58,22 @@ class SiswaController extends Controller
             DB::rollBack();
             return $this->sendResponse('Gagal menambah siswa', $th, 500);
         }
+    }
+    public function show($id)
+    {
+        $siswa = Siswa::with('spp')->findOrFail($id);
+        return $this->sendResponse(null, new SiswaResource($siswa), 200);
+    }
+    public function update($id, Request $request)
+    {
+        $siswa = Siswa::findOrFail($id);
+        $siswa->update($request->all());
+        return $this->sendResponse('Sukses update siswa', null, 200);
+    }
+    public function destroy($id)
+    {
+        $siswa = Siswa::findOrFail($id);
+        $siswa->delete();
+        return $this->sendResponse('Sukses delete siswa', null, 200);
     }
 }

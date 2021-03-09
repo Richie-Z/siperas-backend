@@ -15,7 +15,9 @@ class CekLevel
      */
     public function handle($request, Closure $next, $level)
     {
-        if (auth('petugas')->user()->level != $level)
+        if (auth('siswa')->check())
+            return response()->json(['status' => false, 'message' => 'Akses ditolak'], 401);
+        else if (auth('petugas')->user()->level != $level)
             return response()->json(['status' => false, 'message' => 'Endpoint khusus untuk ' . $level], 401);
         else
             return $next($request);
