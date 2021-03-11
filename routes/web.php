@@ -35,8 +35,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->put('/{id:[0-9]+}', 'PetugasController@update');
         $router->delete('/{id:[0-9]+}', 'PetugasController@destroy');
     });
-    $router->group(['prefix' => 'kelas', 'middleware' => 'auth'], function () use ($router) {
-        $router->post('', 'KelasController@store');
+    $router->post('kelas[/{auto}]', 'KelasController@store');
+    $router->group(['prefix' => 'kelas'], function () use ($router) {
         $router->get('', 'KelasController@index');
         $router->get('/{id:[0-9]+}', 'KelasController@show');
         $router->put('/{id:[0-9]+}', 'KelasController@update');
@@ -52,5 +52,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->put('/{siswa_id:[0-9]+}/spp/{id:[0-9]+}', 'SppController@update');
         $router->delete('/{id:[0-9]+}', 'SiswaController@destroy');
         $router->delete('/{siswa_id:[0-9]+}/spp/{id:[0-9]+}', 'SppController@destroy');
+    });
+    $router->group(['prefix' => 'pembayaran'], function () use ($router) {
+        $router->post('', 'PembayaranController@store');
+        $router->get('', 'PembayaranController@index');
+        $router->get('/{id:[0-9]+}', 'PembayaranController@index');
     });
 });

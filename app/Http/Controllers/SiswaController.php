@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\SiswaResource;
-use Carbon\Carbon;
 
 class SiswaController extends Controller
 {
@@ -19,7 +18,6 @@ class SiswaController extends Controller
     public function __construct()
     {
         $this->middleware('level:admin', ['only' => 'store', 'update', 'destory']);
-        $this->year = Carbon::now()->format('Y');
     }
     public function index()
     {
@@ -51,7 +49,8 @@ class SiswaController extends Controller
             $siswa->kelas_id = $request->kelas_id;
             $siswa->save();
             $siswa->spp()->create([
-                'tahun_ajaran' => $this->year - 1 . '/' . $this->year
+                'tahun_ajaran' => $this->sppAttribute()['tahun_ajaran'],
+                'history_pembayaran' => json_encode($this->sppAttribute()['history_pembayaran'])
             ]);
             DB::commit();
             return $this->sendResponse('Sukses menambah siswa', null, 200);

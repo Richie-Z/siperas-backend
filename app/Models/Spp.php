@@ -14,4 +14,8 @@ class Spp extends Model
     {
         return $this->belongsTo('App\Models\Siswa');
     }
+    public function pembayaran()
+    {
+        return $this->hasMany('App\Models\Pembayaran', 'spp_id');
+    }
 }

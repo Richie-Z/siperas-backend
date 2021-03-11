@@ -78,7 +78,8 @@ $app->configure('app');
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
-    'level' => App\Http\Middleware\CekLevel::class
+    'level' => App\Http\Middleware\CekLevel::class,
+    'isAdmin' => App\Http\Middleware\IsAdmin::class,
 ]);
 
 /*
