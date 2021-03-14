@@ -56,6 +56,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'pembayaran'], function () use ($router) {
         $router->post('', 'PembayaranController@store');
         $router->get('', 'PembayaranController@index');
-        $router->get('/{id:[0-9]+}', 'PembayaranController@index');
+        $router->get('/{id:[0-9]+}', 'PembayaranController@show');
     });
 });

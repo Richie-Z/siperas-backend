@@ -34,4 +34,9 @@ class Petugas extends Model implements AuthenticatableContract, AuthorizableCont
     {
         return [];
     }
+    public function isSuperAdmin(): bool
+    {
+        $user = auth('petugas')->user();
+        return $user->level === 'admin' ? true : false;
+    }
 }

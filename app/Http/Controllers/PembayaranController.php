@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pembayaran;
+use App\Models\Petugas;
 use App\Models\Spp;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -19,11 +20,16 @@ class PembayaranController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('isAdmin', ['only' => 'store']);
+        $this->middleware('isAdmin', ['only' => ['store', 'index']]);
+        $this->user = auth('petugas')->user();
     }
     public function index()
     {
-        return "hello world";
+        $pembayaran = new Pembayaran;
+        if (!$this->user->isSuperAdmin()) {
+            $pembayaran->where('petugas_id', $this->user->id);
+        }
+        return $pembayaran->paginate(10);
     }
     public function store(Request $request)
     {
@@ -182,5 +188,18 @@ class PembayaranController extends Controller
             DB::rollBack();
             return $this->sendResponse('Pembayaran spp gagal', $th, 500);
         }
+    }
+    public function show($id)
+    {
+        $pembayaran = Pembayaran::findOrFail($id);
+        $data = [
+            'id' => $pembayaran->id,
+            'nama_petugas' => $pembayaran->petugas()->first()->nama_petugas,
+            'nama_siswa' => $pembayaran->siswa()->first()->nama,
+            'jumlah_bayar' => $pembayaran->jumlah_bayar,
+            'tgl_bayar' => $pembayaran->tgl_bayar,
+        ];
+        empty($pembayaran->kembalian) ?: $data['kembalian'] = $pembayaran->kembalian;
+        return $this->sendResponse(null, $data, 200);
     }
 }
