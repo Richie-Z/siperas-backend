@@ -76,28 +76,52 @@ class PembayaranController extends Controller
                 $jumlah_pembayaran[] = intval($pembayaran);
             }
             if ($request->has('is_specific')) {
-                if (count($request->pembayaran_untuk) != count($jumlah_pembayaran)) {
+                $kembalian = 0;
+                if (!$request->has('pembayaran_untuk') || count($request->pembayaran_untuk) != count($jumlah_pembayaran)) {
                     return $this->sendResponse("Upps, Pilihan Bulan tidak valid , dengan nominal $request->jumlah_bayar bisa untuk membayar " . count($jumlah_pembayaran) . " bulan", null, 500);
                 }
                 foreach ($request->pembayaran_untuk as $key => $pk) {
                     if (!in_array($pk, $array_bulan) && $spp->nominal == $history_pembayaran->$pk)
                         return $this->sendResponse("Gagal, bulan ke $pk sudah lunas", null, 500);
                     if ($history_pembayaran->$pk != 'kosong') {
-                        if ($history_pembayaran->$pk + $jumlah_pembayaran[$key] > $spp->nominal) {
+                        if ($history_pembayaran->$pk + $jumlah_pembayaran[0] > $spp->nominal) {
                             $kurang_p = $spp->nominal - $history_pembayaran->$pk;
                             $history_pembayaran->$pk = $history_pembayaran->$pk + $kurang_p;
-                            $sisa_pembayaran = $jumlah_pembayaran[$key] - $kurang_p;
+                            $jumlah_pembayaran[0] -= $kurang_p;
+                            if ($history_pembayaran->$pk == $spp->nominal) $jumlah_lunas++;
                             $key = $pk;
                             if ($jumlah_lunas < 12) {
                                 foreach ([6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5] as $ab) {
-                                    if (!in_array($key, $array_bulan)) {
+                                    if (!in_array($key, $array_bulan) && $history_pembayaran->$key == $spp->nominal) {
                                         $key++;
                                     }
                                     $key = $key == 13 ? 1 : $key;
                                 }
-                                $history_pembayaran->$key = $sisa_pembayaran;
-                                $key++;
-                                $key = $key == 13 ? 1 : $key;
+                                if (is_int($history_pembayaran->$key)) {
+                                    if ($history_pembayaran->$key + $jumlah_pembayaran[0] > $spp->nominal) {
+                                        $minus = $spp->nominal - $history_pembayaran->$key;
+                                        $history_pembayaran->$key += $minus;
+                                        $jumlah_pembayaran[0] -= $minus;
+                                        $key++;
+                                    }
+                                    while ($jumlah_pembayaran[0] != 0) {
+                                        if ($history_pembayaran->$key == 'kosong') {
+                                            $history_pembayaran->$key = $jumlah_pembayaran[0];
+                                            $jumlah_pembayaran[0] = 0;
+                                        } else if ($history_pembayaran->$key != $spp->nominal && $history_pembayaran->$key + $jumlah_pembayaran[0] > $spp->nominal) {
+                                            $minus = $spp->nominal - $history_pembayaran->$key;
+                                            $history_pembayaran->$key += $minus;
+                                            $jumlah_pembayaran[0] -= $minus;
+                                        } else {
+                                            $kembalian = $jumlah_pembayaran[0] + 10000;
+                                            $jumlah_pembayaran[0] = 0;
+                                        }
+                                        $key++;
+                                        $key = $key == 13 ? 1 : $key;
+                                    }
+                                } else {
+                                    $history_pembayaran->$key = $jumlah_pembayaran[0];
+                                }
                             }
                         } else {
                             $history_pembayaran->$pk += $jumlah_pembayaran[$key];
@@ -109,6 +133,7 @@ class PembayaranController extends Controller
             } else {
                 $month = intval(Carbon::now()->format('m'));
                 foreach ($jumlah_pembayaran as $key => $jp) {
+                    if ($history_pembayaran->$month == $spp->nominal) $jumlah_lunas++;
                     if ($jumlah_lunas < 12) {
                         foreach ([6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5] as $ab) {
                             if (!in_array($month, $array_bulan)) {
@@ -117,23 +142,24 @@ class PembayaranController extends Controller
                             $month = $month == 13 ? 1 : $month;
                         }
                         $history_pembayaran->$month = $jp == 0 ? "kosong" : $jp;
-                        if ($history_pembayaran->$month == $spp->nominal) $jumlah_lunas++;
                         $month += 1;
                         $month = $month == 13 ? 1 : $month;
                     }
                 }
             }
-            $kembalian = 0;
-            if ($request->jumlah_bayar > $spp->nominal * 12) {
-                $kembalian = array_slice($jumlah_pembayaran, 0, count($jumlah_pembayaran) - count($array_bulan));
-                $kembalian = collect($kembalian)->sum();
-            } else {
-                $jumlah = 0;
-                foreach (json_decode($spp->history_pembayaran) as $sh) {
-                    if ($spp->nominal == $sh) $jumlah += 1;
-                    if ($spp->nominal > $sh && $jumlah == 11) {
-                        $kurang = $spp->nominal - $sh;
-                        $kembalian = collect($jumlah_pembayaran)->sum() - $kurang;
+            if (!$request->has('is_specific')) {
+                $kembalian = 0;
+                if ($request->jumlah_bayar > $spp->nominal * 12) {
+                    $kembalian = array_slice($jumlah_pembayaran, 0, count($jumlah_pembayaran) - count($array_bulan));
+                    $kembalian = collect($kembalian)->sum();
+                } else {
+                    $jumlah = 0;
+                    foreach (json_decode($spp->history_pembayaran) as $sh) {
+                        if ($spp->nominal == $sh) $jumlah += 1;
+                        if ($spp->nominal > $sh || $jumlah == 11) {
+                            $kurang = $spp->nominal - $sh;
+                            $kembalian = collect($jumlah_pembayaran)->sum() - $kurang;
+                        }
                     }
                 }
             }
@@ -152,7 +178,7 @@ class PembayaranController extends Controller
             $spp->pembayaran()->create($arr_create);
             DB::commit();
             return $this->sendResponse($message, null, 200);
-        } catch (\Throwable $th) {
+        } catch (\App\Exceptions\InvalidOrderException $th) {
             DB::rollBack();
             return $this->sendResponse('Pembayaran spp gagal', $th, 500);
         }
