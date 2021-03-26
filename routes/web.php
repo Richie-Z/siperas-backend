@@ -58,4 +58,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('', 'PembayaranController@index');
         $router->get('/{id:[0-9]+}', 'PembayaranController@show');
     });
+    $router->group(['prefix' => 'rekap'], function () use ($router) {
+        $router->get('', 'RekapController@index');
+        $router->get('per_minggu', 'RekapController@perMinggu');
+        $router->get('per_petugas', 'RekapController@perPetugas');
+    });
 });

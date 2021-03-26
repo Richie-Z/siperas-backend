@@ -39,4 +39,8 @@ class Petugas extends Model implements AuthenticatableContract, AuthorizableCont
         $user = auth('petugas')->user();
         return $user->level === 'admin' ? true : false;
     }
+    public function pembayaran()
+    {
+        return $this->hasMany('App\Models\Pembayaran', 'petugas_id');
+    }
 }
