@@ -18,6 +18,7 @@ $router->get('/', function () {
     return response()->json(['status' => true, 'message' => 'Selamat datang di Siperas Endpoint'], 200);
 });
 $router->group(['prefix' => 'api'], function () use ($router) {
+    $router->get('/token_checker',['middleware'=>'auth',function(){return response()->json(true,200);}]);
     $router->group(['prefix' => 'auth'], function () use ($router) {
         $router->post('login', 'AuthController@login');
         $router->post('siswa/login', 'AuthController@loginSiswa');
