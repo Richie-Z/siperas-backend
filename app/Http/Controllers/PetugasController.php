@@ -49,10 +49,18 @@ class PetugasController extends Controller
     public function show($id)
     {
         $petugas = Petugas::findOrFail($id);
-        return $this->sendResponse(null, $petugas, 200);
+        return $this->sendResponse(null, $petugas->load(['pembayaran' => function ($query) {
+            $query->join('siswa', 'siswa.id', '=', 'pembayaran.siswa_id')
+                ->select('pembayaran.petugas_id', 'siswa.nama as nama_siswa', 'pembayaran.tgl_bayar', 'pembayaran.spp_id', 'pembayaran.jumlah_bayar', 'pembayaran.kembalian');
+        }]), 200);
     }
     public function update($id, Request $request)
     {
+        $validate = Validator::make($request->all(), [
+            'username' => 'required|string|unique:petugas,username',
+            'nama_petugas' => 'required|string',
+        ]);
+        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
         $petugas = Petugas::findOrFail($id);
         if ($request->has('level'))
             return $this->sendResponse('Upss, tidak boleh ada Level didalam request', null, 422);
