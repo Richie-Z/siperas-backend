@@ -37,7 +37,7 @@ class PembayaranController extends Controller
             'spp_id' => 'required|exists:App\Models\Spp,id',
             'jumlah_bayar' => 'required|integer'
         ]);
-        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
+        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 422);
         $array_bulan = [6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5];
         $pembayaran = $request->jumlah_bayar;
         DB::beginTransaction();

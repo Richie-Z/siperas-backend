@@ -34,7 +34,7 @@ class KelasController extends Controller
             'kelas' => 'integer|in:10,11,12',
             'kompetensi_keahlian' => 'required|string',
         ]);
-        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
+        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 422);
         $kelas_jurusan = Kelas::where('kompetensi_keahlian', $request->kompetensi_keahlian);
         try {
             if ($kelas_jurusan->count() === 3)

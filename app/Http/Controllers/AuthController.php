@@ -25,7 +25,7 @@ class AuthController extends Controller
             'username' => 'required|string',
             'password' => 'required|string'
         ]);
-        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
+        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 422);
         $credential = request(['username', 'password']);
         $token = Auth::guard('petugas')->attempt($credential);
         return $token ? $this->sendToken($token, 'petugas') :  $this->sendResponse('Gagal,Username/Password salah', null, 401);
@@ -35,7 +35,7 @@ class AuthController extends Controller
         $validate = Validator::make($request->all(), [
             'nisn' => 'required',
         ]);
-        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
+        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 422);
         $siswa = Siswa::where('nisn', $request->nisn)->first();
         if (empty($siswa))
             return $this->sendResponse('Gagal,NISN Salah/Belum Terdaftar', null, 401);

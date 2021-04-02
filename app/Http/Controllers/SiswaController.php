@@ -37,7 +37,7 @@ class SiswaController extends Controller
             'nis' => 'required|string|unique:siswa,nis',
             'kelas_id' => 'required|integer',
         ]);
-        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
+        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 422);
         DB::beginTransaction();
         try {
             $siswa = new Siswa;

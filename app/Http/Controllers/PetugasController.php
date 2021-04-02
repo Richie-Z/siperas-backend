@@ -33,7 +33,7 @@ class PetugasController extends Controller
             'password' => 'required|string',
             'nama_petugas' => 'required|string',
         ]);
-        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
+        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 422);
         try {
             $petugas = new Petugas;
             $petugas->username = $request->username;
@@ -60,7 +60,7 @@ class PetugasController extends Controller
             'username' => 'required|string|unique:petugas,username',
             'nama_petugas' => 'required|string',
         ]);
-        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 401);
+        if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 422);
         $petugas = Petugas::findOrFail($id);
         if ($request->has('level'))
             return $this->sendResponse('Upss, tidak boleh ada Level didalam request', null, 422);
