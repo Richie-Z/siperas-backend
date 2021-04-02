@@ -38,7 +38,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->put('/{id:[0-9]+}', 'PetugasController@update');
         $router->delete('/{id:[0-9]+}', 'PetugasController@destroy');
     });
-    $router->post('kelas[/{auto}]', 'KelasController@store');
+    
+    $router->post('kelas[{auto}]', 'KelasController@store');
     $router->group(['prefix' => 'kelas'], function () use ($router) {
         $router->get('', 'KelasController@index');
         $router->get('/{id:[0-9]+}', 'KelasController@show');
