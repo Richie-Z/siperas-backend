@@ -16,7 +16,8 @@ class SiswaResource extends JsonResource
             'nama' => $this->nama,
             'alamat' => $this->alamat,
             'no_telp' => $this->no_telp,
-            'nis' => $this->nis,
+            'kelas_id' => $this->kelas_id,
+            'kelas_jurusan' => $this->kelas()->first()->kelas . " " . $this->kelas()->first()->kompetensi_keahlian,
             'spp' => SppResource::collection($this->whenLoaded('spp'))
         ];
     }
