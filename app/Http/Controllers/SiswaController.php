@@ -33,8 +33,8 @@ class SiswaController extends Controller
             'nama' => 'required|string',
             'alamat' => 'required|string',
             'no_telp' => 'required|string',
-            'nisn' => 'required|string|unique:siswa,nisn',
-            'nis' => 'required|string|unique:siswa,nis',
+            'nisn' => 'required|integer|unique:siswa,nisn',
+            'nis' => 'required|integer|unique:siswa,nis',
             'kelas_id' => 'required|integer',
         ]);
         if ($validate->fails()) return $this->sendResponse('Validasi gagal', $validate->messages(), 422);

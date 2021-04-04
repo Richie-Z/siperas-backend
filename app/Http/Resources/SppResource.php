@@ -16,6 +16,7 @@ class SppResource extends JsonResource
         }
         $array = [
             'id' => $this->id,
+            'nama_siswa' =>$this->siswa()->first()->nama,
             'tahun_ajaran' => $this->tahun_ajaran,
             'history_pembayaran' => json_decode($this->history_pembayaran),
             'nominal' => $this->nominal,
