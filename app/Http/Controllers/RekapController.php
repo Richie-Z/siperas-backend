@@ -33,7 +33,7 @@ class RekapController extends Controller
         $array_days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
         $days = [];
         foreach ($array_days as $key => $day) {
-            $val = Pembayaran::whereRaw("WEEK(created_at) =" . $this->carbon->week)
+            $val = Pembayaran::whereRaw("WEEK(created_at) =" . ($this->carbon->week - 1))
                 ->whereRaw("DAYOFWEEK(created_at) =" . ($key + 1))
                 ->selectRaw("SUM(jumlah_bayar) as jumlah")
                 ->first()->jumlah;
