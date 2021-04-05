@@ -46,7 +46,7 @@ class PembayaranController extends Controller
             $history_pembayaran  = json_decode($spp->history_pembayaran);
             $jumlah_lunas = 0;
             foreach ($history_pembayaran as $key => $h) {
-                if ($spp->nominal > $h && $h != 'kosong' && !$request->has('is_specific')) {
+                if ($spp->nominal > $h && $h != 'kosong' && $request->is_specific == 0) {
                     $kurang = $spp->nominal - $h;
                     if ($pembayaran > $kurang) {
                         $history_pembayaran->$key = $h + $kurang;
@@ -62,9 +62,10 @@ class PembayaranController extends Controller
                 }
                 if ($h == $spp->nominal) $jumlah_lunas++;
             }
+
             if ($jumlah_lunas == 12)
                 return $this->sendResponse('Error, spp sudah lunas', null, 500);
-
+            $kembalian = $pembayaran || 0;
             $pembayaran /= $spp->nominal;
             $jumlah = 0;
             if ($pembayaran >= 1) {
@@ -76,11 +77,12 @@ class PembayaranController extends Controller
                     $sisa = $request->jumlah_bayar - $jumlah;
                     $jumlah_pembayaran[] = $sisa;
                 }
+                $pembayaran *= $spp->nominal;
             } else {
                 $pembayaran *= $spp->nominal;
                 $jumlah_pembayaran[] = intval($pembayaran);
             }
-            if ($request->has('is_specific')) {
+            if ($request->is_specific == 1) {
                 $kembalian = 0;
                 if (!$request->has('pembayaran_untuk') || count($request->pembayaran_untuk) != count($jumlah_pembayaran)) {
                     return $this->sendResponse("Upps, Pilihan Bulan tidak valid , dengan nominal $request->jumlah_bayar bisa untuk membayar " . count($jumlah_pembayaran) . " bulan", null, 500);
@@ -152,16 +154,16 @@ class PembayaranController extends Controller
                     }
                 }
             }
-            if (!$request->has('is_specific')) {
+            if ($request->is_specific == 0 && $kembalian != 0) {
                 $kembalian = 0;
-                if ($request->jumlah_bayar > $spp->nominal * 12) {
+                if (is_int($request->jumlah_bayar) ? $request->jumlah_bayar : intval($request->jumlah_bayar) > $spp->nominal * 12) {
                     $kembalian = array_slice($jumlah_pembayaran, 0, count($jumlah_pembayaran) - count($array_bulan));
                     $kembalian = collect($kembalian)->sum();
                 } else {
                     $jumlah = 0;
                     foreach (json_decode($spp->history_pembayaran) as $sh) {
                         if ($spp->nominal == $sh) $jumlah += 1;
-                        if ($spp->nominal > $sh || $jumlah == 11) {
+                        if (is_int($sh) && $spp->nominal >= $sh && $jumlah >= 11) {
                             $kurang = $spp->nominal - $sh;
                             $kembalian = collect($jumlah_pembayaran)->sum() - $kurang;
                         }
