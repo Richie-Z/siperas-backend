@@ -38,7 +38,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->put('/{id:[0-9]+}', 'PetugasController@update');
         $router->delete('/{id:[0-9]+}', 'PetugasController@destroy');
     });
-    
+
     $router->post('kelas[{auto}]', 'KelasController@store');
     $router->group(['prefix' => 'kelas'], function () use ($router) {
         $router->get('', 'KelasController@index');
@@ -61,6 +61,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('', 'PembayaranController@store');
         $router->get('', 'PembayaranController@index');
         $router->get('/{id:[0-9]+}', 'PembayaranController@show');
+        $router->get('/history', 'PembayaranController@history');
     });
     $router->group(['prefix' => 'rekap'], function () use ($router) {
         $router->get('', 'RekapController@index');

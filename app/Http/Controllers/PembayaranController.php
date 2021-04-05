@@ -201,4 +201,11 @@ class PembayaranController extends Controller
         empty($pembayaran->kembalian) ?: $data['kembalian'] = $pembayaran->kembalian;
         return $this->sendResponse(null, $data, 200);
     }
+    public function history()
+    {
+        $data = auth('petugas')->user()->pembayaran()->leftJoin('siswa', 'siswa.id', 'pembayaran.siswa_id')
+            ->select('pembayaran.id', 'siswa.nama as nama_siswa', 'pembayaran.siswa_id', 'pembayaran.jumlah_bayar', 'pembayaran.kembalian', 'pembayaran.tgl_bayar')
+            ->paginate(10);
+        return $this->sendResponse(null, $data, 200);
+    }
 }
