@@ -199,8 +199,8 @@ class PembayaranController extends Controller
             'nama_siswa' => $pembayaran->siswa()->first()->nama,
             'jumlah_bayar' => $pembayaran->jumlah_bayar,
             'tgl_bayar' => $pembayaran->tgl_bayar,
+            'kembalian' => $pembayaran->kembalian || 0
         ];
-        empty($pembayaran->kembalian) ?: $data['kembalian'] = $pembayaran->kembalian;
         return $this->sendResponse(null, $data, 200);
     }
     public function history()

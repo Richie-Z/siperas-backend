@@ -51,7 +51,7 @@ class PetugasController extends Controller
         $petugas = Petugas::findOrFail($id);
         return $this->sendResponse(null, $petugas->load(['pembayaran' => function ($query) {
             $query->join('siswa', 'siswa.id', '=', 'pembayaran.siswa_id')
-                ->select('pembayaran.petugas_id', 'siswa.nama as nama_siswa', 'pembayaran.tgl_bayar', 'pembayaran.spp_id', 'pembayaran.jumlah_bayar', 'pembayaran.kembalian');
+                ->select('pembayaran.id','pembayaran.petugas_id', 'siswa.nama as nama_siswa', 'pembayaran.tgl_bayar', 'pembayaran.spp_id', 'pembayaran.jumlah_bayar', 'pembayaran.kembalian');
         }]), 200);
     }
     public function update($id, Request $request)
