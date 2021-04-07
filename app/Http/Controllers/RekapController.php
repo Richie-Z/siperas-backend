@@ -22,7 +22,7 @@ class RekapController extends Controller
     {
         $array = [
             'today' => Pembayaran::whereDay('created_at', $this->carbon->day)->selectRaw('SUM(jumlah_bayar) as jumlah')->first()->jumlah,
-            'week' => Pembayaran::whereRaw("WEEK(created_at) =" . $this->carbon->week)->selectRaw('SUM(jumlah_bayar) as jumlah')->first()->jumlah,
+            'week' => Pembayaran::whereRaw("WEEK(created_at) =" . ($this->carbon->week - 1))->selectRaw('SUM(jumlah_bayar) as jumlah')->first()->jumlah,
             'month' => Pembayaran::whereMonth('created_at', $this->carbon->month)->selectRaw('SUM(jumlah_bayar) as jumlah')->first()->jumlah,
             'petugas' => Petugas::where('level', '!=', 'admin')->count()
         ];
